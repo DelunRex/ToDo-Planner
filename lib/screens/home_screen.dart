@@ -12,12 +12,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _auth = FirebaseAuth.instance;
   final databaseReference = FirebaseFirestore.instance;
-  // String Email = LoginScreen.em;
+  String Email = LoginScreen.em;
   String todoTitle = "";
 
   createTodos() async {
     Map<String, String> todos = {"todoTitle": todoTitle};
-    await databaseReference.collection("MyTodos").doc(todoTitle).set(todos);
+    await databaseReference
+        .collection("MyTodos")
+        .doc(Email)
+        .collection("todo")
+        .doc(todoTitle)
+        .set(todos);
     /*  DocumentReference documentReference =
         await databaseReference.collection("MyTodos").add(todos); */ //Store with random doc id
 
@@ -28,7 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   deleteTodos(item) {
-    databaseReference.collection("MyTodos").doc(item).delete();
+    databaseReference
+        .collection("MyTodos")
+        .doc(Email)
+        .collection("todo")
+        .doc(item)
+        .delete();
     //  DocumentReference documentReference =
     //    FirebaseFirestore.instance.collection("MyTodos").doc(item);
 
@@ -87,7 +97,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: StreamBuilder(
-          stream: databaseReference.collection("MyTodos").snapshots(),
+          stream: databaseReference
+              .collection("MyTodos")
+              .doc(Email)
+              .collection("todo")
+              .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
