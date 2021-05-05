@@ -1,0 +1,1 @@
+Simple to-do daily tasks planner app with registration and login features.
