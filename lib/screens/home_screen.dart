@@ -104,36 +104,45 @@ class _HomeScreenState extends State<HomeScreen> {
               .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasData) {
-              return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) {
-                    DocumentSnapshot documentSnapshot =
-                        snapshot.data.docs[index];
-                    return Dismissible(
-                        onDismissed: (direction) {
-                          deleteTodos(documentSnapshot["todoTitle"]);
-                        },
-                        key: Key(documentSnapshot["todoTitle"]),
-                        child: Card(
-                          elevation: 4,
-                          margin: EdgeInsets.all(8),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          child: ListTile(
-                            title: Text(documentSnapshot["todoTitle"]),
-                            trailing: IconButton(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Colors.red[200],
-                                ),
-                                onPressed: () {
-                                  deleteTodos(documentSnapshot["todoTitle"]);
-                                }),
-                          ),
-                        ));
-                  });
-            }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else {
+                return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: snapshot.data.docs.length,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot documentSnapshot =
+                          snapshot.data.docs[index];
+                      return Dismissible(
+                          onDismissed: (direction) {
+                            setState(() {
+                              deleteTodos(documentSnapshot["todoTitle"]);
+                            });
+                          },
+                          key: Key(documentSnapshot["todoTitle"]),
+                          child: Card(
+                            elevation: 4,
+                            margin: EdgeInsets.all(8),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            child: ListTile(
+                              title: Text(documentSnapshot["todoTitle"]),
+                              trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.red[200],
+                                  ),
+                                  onPressed: () {
+                                    deleteTodos(documentSnapshot["todoTitle"]);
+                                  }),
+                            ),
+                          ));
+                    });
+              }
+            } else if (snapshot.hasError) {
+              return Text(snapshot.error.toString());
+            } else
+              return CircularProgressIndicator();
           }),
     );
   }
